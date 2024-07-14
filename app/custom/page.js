@@ -300,47 +300,47 @@ const ReactTable = () => {
         } else if (column.filterVariant === "text") {
             return (
                 <>
-                <TextField
-                    key={header.id}
-                    label={header.id}
-                    value={textFilters[column.accessorKey] || ""}
-                    onChange={(e) =>
-                        setTextFilters((prev) => ({
-                            ...prev,
-                            [column.accessorKey]: e.target.value,
-                        }))
-                    }
-                    variant="standard"
-                    fullWidth
-                />
+                    <TextField
+                        key={header.id}
+                        label={header.id}
+                        value={textFilters[column.accessorKey] || ""}
+                        onChange={(e) =>
+                            setTextFilters((prev) => ({
+                                ...prev,
+                                [column.accessorKey]: e.target.value,
+                            }))
+                        }
+                        variant="standard"
+                        fullWidth
+                    />
                 </>
             );
         } else if (column.filterVariant === "multi-select") {
             return (
                 <>
-                <label>{header.id}</label>
-                <Select
-                    key={header.id}
-                    label={header.id}
-                    multiple
-                    value={selectFilters[column.accessorKey] || []}
-                    onChange={(e) =>
-                        setSelectFilters((prev) => ({
-                            ...prev,
-                            [column.accessorKey]: e.target.value,
-                        }))
-                    }
-                    variant="standard"
-                    fullWidth
-                >
-                    {Array.from(
-                        new Set(data.map((row) => row[column.accessorKey]))
-                    ).map((value) => (
-                        <MenuItem key={value} value={value}>
-                            {value}
-                        </MenuItem>
-                    ))}
-                </Select>
+                    <label>{header.id}</label>
+                    <Select
+                        key={header.id}
+                        label={header.id}
+                        multiple
+                        value={selectFilters[column.accessorKey] || []}
+                        onChange={(e) =>
+                            setSelectFilters((prev) => ({
+                                ...prev,
+                                [column.accessorKey]: e.target.value,
+                            }))
+                        }
+                        variant="standard"
+                        fullWidth
+                    >
+                        {Array.from(
+                            new Set(data.map((row) => row[column.accessorKey]))
+                        ).map((value) => (
+                            <MenuItem key={value} value={value}>
+                                {value}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 </>
             );
         } else if (column.filterVariant === "range-slider") {
@@ -403,7 +403,7 @@ const ReactTable = () => {
                     open={isGroupDrawerOpen}
                     onClose={() => setIsGroupDrawerOpen(false)}
                 >
-                    <Paper style={{ width: 300, padding: "16px" }}>
+                    <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
                         <List>
                             {columns
                                 .filter((col) => col.enableGrouping)
@@ -432,7 +432,7 @@ const ReactTable = () => {
                     open={isColumnDrawerOpen}
                     onClose={() => setIsColumnDrawerOpen(false)}
                 >
-                    <Paper style={{ width: 300, padding: "16px" }}>
+                    <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
                         <List>
                             {columns.map((column) => (
                                 <ListItem key={column.accessorKey}>
@@ -498,7 +498,7 @@ const ReactTable = () => {
                     open={isSortDrawerOpen}
                     onClose={() => setIsSortDrawerOpen(false)}
                 >
-                    <Paper style={{ width: 300, padding: "16px" }}>
+                    <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
                         <List>
                             {columns.map((column) => (
                                 <ListItem key={column.accessorKey}>
