@@ -5,7 +5,6 @@ import {
     useMaterialReactTable,
     MaterialReactTable,
     MRT_ToggleGlobalFilterButton,
-    MRT_TableHeadCellFilterContainer,
 } from "material-react-table";
 import moment from "moment";
 import {
@@ -268,7 +267,6 @@ const ReactTable = () => {
         if (column.filterVariant === "date") {
             return (
                 <Box key={header.id} sx={{ mb: 2 }}>
-                    Filter - {header.id}
                     <DatePicker
                         label={`Min ${column.header}`}
                         value={dateFilters[column.accessorKey]?.min || null}
@@ -301,6 +299,7 @@ const ReactTable = () => {
             );
         } else if (column.filterVariant === "text") {
             return (
+                <>
                 <TextField
                     key={header.id}
                     label={header.id}
@@ -314,9 +313,12 @@ const ReactTable = () => {
                     variant="standard"
                     fullWidth
                 />
+                </>
             );
         } else if (column.filterVariant === "multi-select") {
             return (
+                <>
+                <label>{header.id}</label>
                 <Select
                     key={header.id}
                     label={header.id}
@@ -339,6 +341,7 @@ const ReactTable = () => {
                         </MenuItem>
                     ))}
                 </Select>
+                </>
             );
         } else if (column.filterVariant === "range-slider") {
             const minValue = Math.min(...data.map((row) => row[column.accessorKey]));
@@ -419,6 +422,9 @@ const ReactTable = () => {
                         <Button variant="contained" onClick={applyGrouping}>
                             Apply
                         </Button>
+                        <Button variant="outlined" onClick={() => setGroupedColumns([])}>
+                            Clear Grouping
+                        </Button>
                     </Paper>
                 </Drawer>
                 <Drawer
@@ -449,11 +455,44 @@ const ReactTable = () => {
                                 </ListItem>
                             ))}
                         </List>
-                        <Button variant="contained" onClick={applyColumnVisibility}>
-                            Apply
-                        </Button>
+                        <Stack direction="row" spacing={2} justifyContent="flex-end">
+                            <Button
+                                variant="outlined"
+                                onClick={() =>
+                                    setTempColumnVisibility(
+                                        Object.fromEntries(
+                                            columns.map((column) => [
+                                                column.accessorKey,
+                                                false,
+                                            ])
+                                        )
+                                    )
+                                }
+                            >
+                                Hide All
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                onClick={() =>
+                                    setTempColumnVisibility(
+                                        Object.fromEntries(
+                                            columns.map((column) => [
+                                                column.accessorKey,
+                                                true,
+                                            ])
+                                        )
+                                    )
+                                }
+                            >
+                                Show All
+                            </Button>
+                            <Button variant="contained" onClick={applyColumnVisibility}>
+                                Apply
+                            </Button>
+                        </Stack>
                     </Paper>
                 </Drawer>
+
                 <Drawer
                     anchor="right"
                     open={isSortDrawerOpen}
@@ -465,26 +504,47 @@ const ReactTable = () => {
                                 <ListItem key={column.accessorKey}>
                                     <ListItemText primary={column.header} />
                                     <Select
-                                        value={sorting.find(sort => sort.id === column.accessorKey)?.desc ? 'desc' : sorting.find(sort => sort.id === column.accessorKey) ? 'asc' : ''}
+                                        value={
+                                            sorting.find((sort) => sort.id === column.accessorKey)
+                                                ?.desc
+                                                ? "desc"
+                                                : sorting.find((sort) => sort.id === column.accessorKey)
+                                                    ? "asc"
+                                                    : ""
+                                        }
                                         onChange={(e) => {
                                             const value = e.target.value;
                                             setSorting((prev) => {
-                                                const existingSort = prev.find(sort => sort.id === column.accessorKey);
-                                                if (value === 'asc') {
+                                                const existingSort = prev.find(
+                                                    (sort) => sort.id === column.accessorKey
+                                                );
+                                                if (value === "asc") {
                                                     // If currently sorted ascending, clear the sort
                                                     if (existingSort) {
-                                                        return prev.filter(sort => sort.id !== column.accessorKey);
+                                                        return prev.filter(
+                                                            (sort) => sort.id !== column.accessorKey
+                                                        );
                                                     }
-                                                    return [...prev, { id: column.accessorKey, desc: false }];
-                                                } else if (value === 'desc') {
+                                                    return [
+                                                        ...prev,
+                                                        { id: column.accessorKey, desc: false },
+                                                    ];
+                                                } else if (value === "desc") {
                                                     // If currently sorted descending, clear the sort
                                                     if (existingSort && existingSort.desc) {
-                                                        return prev.filter(sort => sort.id !== column.accessorKey);
+                                                        return prev.filter(
+                                                            (sort) => sort.id !== column.accessorKey
+                                                        );
                                                     }
-                                                    return [...prev, { id: column.accessorKey, desc: true }];
+                                                    return [
+                                                        ...prev,
+                                                        { id: column.accessorKey, desc: true },
+                                                    ];
                                                 } else {
                                                     // If set to none, remove sorting
-                                                    return prev.filter(sort => sort.id !== column.accessorKey);
+                                                    return prev.filter(
+                                                        (sort) => sort.id !== column.accessorKey
+                                                    );
                                                 }
                                             });
                                         }}
@@ -498,6 +558,9 @@ const ReactTable = () => {
                         </List>
                         <Button variant="contained" onClick={applySorting}>
                             Apply Sorting
+                        </Button>
+                        <Button variant="outlined" onClick={() => setSorting([])}>
+                            Clear Sorting
                         </Button>
                     </Paper>
                 </Drawer>
