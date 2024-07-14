@@ -198,7 +198,7 @@ const ReactTable = () => {
                     onClose={() => setIsGroupDrawerOpen(false)}
                 >
                     <Paper style={{ width: 300, padding: '16px' }}>
-                    <List>
+                        <List>
                             {columns.filter(col => col.enableGrouping).map((column) => (
                                 <ListItem key={column.accessorKey} onClick={() => handleGroupToggle(column.accessorKey)}>
                                     <Checkbox
@@ -256,10 +256,21 @@ const ReactTable = () => {
                                             const value = e.target.value;
                                             setSorting((prev) => {
                                                 const existingSort = prev.find(sort => sort.id === column.accessorKey);
-                                                if (existingSort) {
-                                                    return prev.map(sort => sort.id === column.accessorKey ? { id: column.accessorKey, desc: value === 'desc' } : sort);
+                                                if (value === 'asc') {
+                                                    // If currently sorted ascending, clear the sort
+                                                    if (existingSort) {
+                                                        return prev.filter(sort => sort.id !== column.accessorKey);
+                                                    }
+                                                    return [...prev, { id: column.accessorKey, desc: false }];
+                                                } else if (value === 'desc') {
+                                                    // If currently sorted descending, clear the sort
+                                                    if (existingSort && existingSort.desc) {
+                                                        return prev.filter(sort => sort.id !== column.accessorKey);
+                                                    }
+                                                    return [...prev, { id: column.accessorKey, desc: true }];
                                                 } else {
-                                                    return [...prev, { id: column.accessorKey, desc: value === 'desc' }];
+                                                    // If set to none, remove sorting
+                                                    return prev.filter(sort => sort.id !== column.accessorKey);
                                                 }
                                             });
                                         }}
@@ -268,6 +279,7 @@ const ReactTable = () => {
                                         <MenuItem value="asc">Ascending</MenuItem>
                                         <MenuItem value="desc">Descending</MenuItem>
                                     </Select>
+
                                 </ListItem>
                             ))}
                         </List>
@@ -281,4 +293,4 @@ const ReactTable = () => {
 
 export default ReactTable;
 
-                       
+
