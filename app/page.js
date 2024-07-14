@@ -28,10 +28,7 @@ import {
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import GroupIcon from "@mui/icons-material/Group";
-import ViewColumnIcon from "@mui/icons-material/ViewColumn";
-import SortIcon from "@mui/icons-material/Sort";
+import { FilterList, Group, ViewColumn, Sort } from "@mui/icons-material";
 
 const ReactTable = () => {
     const [data, setData] = useState([]);
@@ -59,8 +56,8 @@ const ReactTable = () => {
                 );
                 const formattedData = response.data.map((item) => ({
                     ...item,
-                    createdAt: moment(item.createdAt).format("YYYY-MM-DD"),
-                    updatedAt: moment(item.updatedAt).format("YYYY-MM-DD"),
+                    createdAt: moment(item.createdAt).format("MM-DD-YYYY"),
+                    updatedAt: moment(item.updatedAt).format("MM-DD-YYYY"),
                 }));
                 setData(formattedData);
             } catch (error) {
@@ -74,72 +71,14 @@ const ReactTable = () => {
 
     const columns = useMemo(
         () => [
-            {
-                accessorKey: "id",
-                header: "ID",
-                enableGrouping: false,
-                size: 150,
-                filterFn: "equals",
-                filterVariant: "text",
-            },
-            {
-                accessorKey: "name",
-                header: "Name",
-                enableGrouping: false,
-                size: 150,
-                filterFn: "includesString",
-                filterVariant: "text",
-            },
-            {
-                accessorKey: "category",
-                header: "Category",
-                filterVariant: "multi-select",
-                enableGrouping: true,
-                size: 200,
-                filterFn: "arrIncludes",
-            },
-            {
-                accessorKey: "subcategory",
-                header: "Sub Category",
-                filterVariant: "multi-select",
-                enableGrouping: true,
-                size: 200,
-                filterFn: "arrIncludes",
-            },
-            {
-                accessorKey: "createdAt",
-                header: "Created At",
-                enableGrouping: false,
-                size: 200,
-                filterFn: "dateBetween",
-                filterVariant: "date",
-                Cell: ({ cell }) => moment(cell.getValue()).format("DD-MMM-YY"),
-            },
-            {
-                accessorKey: "updatedAt",
-                header: "Updated At",
-                enableGrouping: false,
-                size: 200,
-                filterFn: "dateBetween",
-                filterVariant: "date",
-                Cell: ({ cell }) => moment(cell.getValue()).format("DD-MMM-YY"),
-            },
-            {
-                accessorKey: "price",
-                header: "Price",
-                filterVariant: "range-slider",
-                enableGrouping: false,
-                size: 150,
-                filterFn: "between",
-            },
-            {
-                accessorKey: "sale_price",
-                header: "Sale Price",
-                filterVariant: "range-slider",
-                enableGrouping: false,
-                size: 150,
-                filterFn: "between",
-            },
+            { accessorKey: "id", header: "ID", enableGrouping: false, size: 150, filterFn: "equals", filterVariant: "text" },
+            { accessorKey: "name", header: "Name", enableGrouping: false, size: 150, filterFn: "includesString", filterVariant: "text" },
+            { accessorKey: "category", header: "Category", enableGrouping: true, size: 200, filterFn: "arrIncludes", filterVariant: "multi-select" },
+            { accessorKey: "subcategory", header: "Sub Category", enableGrouping: true, size: 200, filterFn: "arrIncludes", filterVariant: "multi-select" },
+            { accessorKey: "createdAt", header: "Created At", enableGrouping: false, size: 200, filterFn: "dateBetween", sortingFn: 'datetime', filterVariant: "date", Cell: ({ cell }) => moment(cell.getValue()).format("MM-DD-YYYY"), },
+            { accessorKey: "updatedAt", header: "Updated At", enableGrouping: false, size: 200, filterFn: "dateBetween", sortingFn: 'datetime', filterVariant: "date", Cell: ({ cell }) => moment(cell.getValue()).format("MM-DD-YYYY"), },
+            { accessorKey: "price", header: "Price", enableGrouping: false, size: 150, filterFn: "between", filterVariant: "range-slider" },
+            { accessorKey: "sale_price", header: "Sale Price", enableGrouping: false, size: 150, filterFn: "between", filterVariant: "range-slider" },
         ],
         []
     );
@@ -148,6 +87,7 @@ const ReactTable = () => {
         columns,
         data,
         columnFilterDisplayMode: "custom",
+        enableColumnFilterModes: true,
         enableGlobalFilter: true,
         enableFacetedValues: true,
         enableGrouping: true,
@@ -160,28 +100,21 @@ const ReactTable = () => {
         muiTableBodyCellProps: { align: "center" },
         muiTableHeadCellProps: { align: "center" },
         onSortingChange: setSorting,
-        muiFilterTextFieldProps: ({ column }) => ({
-            label: `Filter by ${column.columnDef.header}`,
-        }),
+        muiFilterTextFieldProps: ({ column }) => ({ label: `Filter by ${column.columnDef.header}` }),
         renderToolbarInternalActions: ({ table }) => (
             <Box>
                 <MRT_ToggleGlobalFilterButton table={table} />
                 <IconButton onClick={() => setIsFilterDrawerOpen(!isFilterDrawerOpen)}>
-                    <FilterListIcon />
+                    <FilterList />
                 </IconButton>
                 <IconButton onClick={() => setIsGroupDrawerOpen(!isGroupDrawerOpen)}>
-                    <GroupIcon />
+                    <Group />
                 </IconButton>
-                <IconButton
-                    onClick={() => {
-                        setTempColumnVisibility(columnVisibility);
-                        setIsColumnDrawerOpen(!isColumnDrawerOpen);
-                    }}
-                >
-                    <ViewColumnIcon />
+                <IconButton onClick={() => { setTempColumnVisibility(columnVisibility); setIsColumnDrawerOpen(!isColumnDrawerOpen); }}>
+                    <ViewColumn />
                 </IconButton>
                 <IconButton onClick={() => setIsSortDrawerOpen(!isSortDrawerOpen)}>
-                    <SortIcon />
+                    <Sort />
                 </IconButton>
             </Box>
         ),
@@ -189,9 +122,7 @@ const ReactTable = () => {
 
     const handleGroupToggle = (column) => {
         setGroupedColumns((prev) =>
-            prev.includes(column)
-                ? prev.filter((col) => col !== column)
-                : [...prev, column]
+            prev.includes(column) ? prev.filter((col) => col !== column) : [...prev, column]
         );
     };
 
@@ -212,49 +143,17 @@ const ReactTable = () => {
 
     const applyFilters = () => {
         table.setColumnFilters([
-            {
-                id: "createdAt",
-                value: dateFilters.createdAt.min
-                    ? [
-                        moment(dateFilters.createdAt.min).format("YYYY-MM-DD"),
-                        dateFilters.createdAt.max
-                            ? moment(dateFilters.createdAt.max).format("YYYY-MM-DD")
-                            : undefined,
-                    ]
-                    : undefined,
-            },
-            {
-                id: "updatedAt",
-                value: dateFilters.updatedAt.min
-                    ? [
-                        moment(dateFilters.updatedAt.min).format("YYYY-MM-DD"),
-                        dateFilters.updatedAt.max
-                            ? moment(dateFilters.updatedAt.max).format("YYYY-MM-DD")
-                            : undefined,
-                    ]
-                    : undefined,
-            },
-            ...Object.keys(textFilters).map((key) => ({
-                id: key,
-                value: textFilters[key],
-            })),
-            ...Object.keys(selectFilters).map((key) => ({
-                id: key,
-                value: selectFilters[key],
-            })),
-            ...Object.keys(rangeFilters).map((key) => ({
-                id: key,
-                value: rangeFilters[key],
-            })),
+            { id: "createdAt", value: dateFilters.createdAt.min ? [moment(dateFilters.createdAt.min).format("MM-DD-YYYY"), dateFilters.createdAt.max ? moment(dateFilters.createdAt.max).format("MM-DD-YYYY") : undefined] : undefined },
+            { id: "updatedAt", value: dateFilters.updatedAt.min ? [moment(dateFilters.updatedAt.min).format("MM-DD-YYYY"), dateFilters.updatedAt.max ? moment(dateFilters.updatedAt.max).format("MM-DD-YYYY") : undefined] : undefined },
+            ...Object.keys(textFilters).map((key) => ({ id: key, value: textFilters[key] })),
+            ...Object.keys(selectFilters).map((key) => ({ id: key, value: selectFilters[key] })),
+            ...Object.keys(rangeFilters).map((key) => ({ id: key, value: rangeFilters[key] })),
         ]);
         setIsFilterDrawerOpen(false);
     };
 
     const clearFilters = () => {
-        setDateFilters({
-            createdAt: { min: null, max: null },
-            updatedAt: { min: null, max: null },
-        });
+        setDateFilters({ createdAt: { min: null, max: null }, updatedAt: { min: null, max: null } });
         setTextFilters({});
         setSelectFilters({});
         setRangeFilters({});
@@ -263,57 +162,35 @@ const ReactTable = () => {
 
     const renderCustomFilter = (header) => {
         const column = header.column.columnDef;
+        const accessorKey = column.accessorKey;
 
         if (column.filterVariant === "date") {
             return (
                 <Box key={header.id} sx={{ mb: 2 }}>
                     <DatePicker
                         label={`Min ${column.header}`}
-                        value={dateFilters[column.accessorKey]?.min || null}
-                        onChange={(newValue) =>
-                            setDateFilters((prev) => ({
-                                ...prev,
-                                [column.accessorKey]: {
-                                    ...prev[column.accessorKey],
-                                    min: newValue,
-                                },
-                            }))
-                        }
+                        value={dateFilters[accessorKey]?.min || null}
+                        onChange={(newValue) => setDateFilters((prev) => ({ ...prev, [accessorKey]: { ...prev[accessorKey], min: newValue } }))}
                         slotProps={{ textField: { variant: "standard" } }}
                     />
                     <DatePicker
                         label={`Max ${column.header}`}
-                        value={dateFilters[column.accessorKey]?.max || null}
-                        onChange={(newValue) =>
-                            setDateFilters((prev) => ({
-                                ...prev,
-                                [column.accessorKey]: {
-                                    ...prev[column.accessorKey],
-                                    max: newValue,
-                                },
-                            }))
-                        }
+                        value={dateFilters[accessorKey]?.max || null}
+                        onChange={(newValue) => setDateFilters((prev) => ({ ...prev, [accessorKey]: { ...prev[accessorKey], max: newValue } }))}
                         slotProps={{ textField: { variant: "standard" } }}
                     />
                 </Box>
             );
         } else if (column.filterVariant === "text") {
             return (
-                <>
-                    <TextField
-                        key={header.id}
-                        label={header.id}
-                        value={textFilters[column.accessorKey] || ""}
-                        onChange={(e) =>
-                            setTextFilters((prev) => ({
-                                ...prev,
-                                [column.accessorKey]: e.target.value,
-                            }))
-                        }
-                        variant="standard"
-                        fullWidth
-                    />
-                </>
+                <TextField
+                    key={header.id}
+                    label={header.id}
+                    value={textFilters[accessorKey] || ""}
+                    onChange={(e) => setTextFilters((prev) => ({ ...prev, [accessorKey]: e.target.value }))}
+                    variant="standard"
+                    fullWidth
+                />
             );
         } else if (column.filterVariant === "multi-select") {
             return (
@@ -323,19 +200,12 @@ const ReactTable = () => {
                         key={header.id}
                         label={header.id}
                         multiple
-                        value={selectFilters[column.accessorKey] || []}
-                        onChange={(e) =>
-                            setSelectFilters((prev) => ({
-                                ...prev,
-                                [column.accessorKey]: e.target.value,
-                            }))
-                        }
+                        value={selectFilters[accessorKey] || []}
+                        onChange={(e) => setSelectFilters((prev) => ({ ...prev, [accessorKey]: e.target.value }))}
                         variant="standard"
                         fullWidth
                     >
-                        {Array.from(
-                            new Set(data.map((row) => row[column.accessorKey]))
-                        ).map((value) => (
+                        {Array.from(new Set(data.map((row) => row[accessorKey]))).map((value) => (
                             <MenuItem key={value} value={value}>
                                 {value}
                             </MenuItem>
@@ -344,31 +214,22 @@ const ReactTable = () => {
                 </>
             );
         } else if (column.filterVariant === "range-slider") {
-            const minValue = Math.min(...data.map((row) => row[column.accessorKey]));
-            const maxValue = Math.max(...data.map((row) => row[column.accessorKey]));
+            const minValue = Math.min(...data.map((row) => row[accessorKey]));
+            const maxValue = Math.max(...data.map((row) => row[accessorKey]));
             return (
                 <Box key={header.id} sx={{ mb: 2 }}>
                     <label>{header.id}</label>
                     <Slider
-                        value={rangeFilters[column.accessorKey] || [minValue, maxValue]}
-                        onChange={(event, newValue) =>
-                            setRangeFilters((prev) => ({
-                                ...prev,
-                                [column.accessorKey]: newValue,
-                            }))
-                        }
+                        value={rangeFilters[accessorKey] || [minValue, maxValue]}
+                        onChange={(event, newValue) => setRangeFilters((prev) => ({ ...prev, [accessorKey]: newValue }))}
                         valueLabelDisplay="auto"
                         min={minValue}
                         max={maxValue}
-                        marks={[
-                            { value: minValue, label: `${minValue}` },
-                            { value: maxValue, label: `${maxValue}` },
-                        ]}
+                        marks={[{ value: minValue, label: `${minValue}` }, { value: maxValue, label: `${maxValue}` }]}
                     />
                 </Box>
             );
         }
-
         return null;
     };
 
@@ -376,19 +237,10 @@ const ReactTable = () => {
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <Stack direction={isMobile ? "column-reverse" : "row"} gap="8px">
                 <MaterialReactTable table={table} />
-                <Drawer
-                    anchor="right"
-                    open={isFilterDrawerOpen}
-                    onClose={() => setIsFilterDrawerOpen(false)}
-                >
+                <Drawer anchor="right" open={isFilterDrawerOpen} onClose={() => setIsFilterDrawerOpen(false)}>
                     <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
                         <Stack gap="8px">
-                            {table.getLeafHeaders().map((header) => {
-                                if (header.column.getCanFilter()) {
-                                    return renderCustomFilter(header);
-                                }
-                                return null;
-                            })}
+                            {table.getLeafHeaders().map((header) => header.column.getCanFilter() && renderCustomFilter(header))}
                             <Button variant="contained" onClick={applyFilters}>
                                 Apply Filters
                             </Button>
@@ -398,40 +250,21 @@ const ReactTable = () => {
                         </Stack>
                     </Paper>
                 </Drawer>
-                <Drawer
-                    anchor="right"
-                    open={isGroupDrawerOpen}
-                    onClose={() => setIsGroupDrawerOpen(false)}
-                >
+                <Drawer anchor="right" open={isGroupDrawerOpen} onClose={() => setIsGroupDrawerOpen(false)}>
                     <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
                         <List>
-                            {columns
-                                .filter((col) => col.enableGrouping)
-                                .map((column) => (
-                                    <ListItem
-                                        key={column.accessorKey}
-                                        onClick={() => handleGroupToggle(column.accessorKey)}
-                                    >
-                                        <Checkbox
-                                            checked={groupedColumns.includes(column.accessorKey)}
-                                        />
-                                        <ListItemText primary={column.header} />
-                                    </ListItem>
-                                ))}
+                            {columns.filter((col) => col.enableGrouping).map((column) => (
+                                <ListItem key={column.accessorKey} onClick={() => handleGroupToggle(column.accessorKey)}>
+                                    <Checkbox checked={groupedColumns.includes(column.accessorKey)} />
+                                    <ListItemText primary={column.header} />
+                                </ListItem>
+                            ))}
                         </List>
-                        <Button variant="contained" onClick={applyGrouping}>
-                            Apply
-                        </Button>
-                        <Button variant="outlined" onClick={() => setGroupedColumns([])}>
-                            Clear Grouping
-                        </Button>
+                        <Button variant="contained" onClick={applyGrouping}>Apply</Button>
+                        <Button variant="outlined" onClick={() => setGroupedColumns([])}>Clear Grouping</Button>
                     </Paper>
                 </Drawer>
-                <Drawer
-                    anchor="right"
-                    open={isColumnDrawerOpen}
-                    onClose={() => setIsColumnDrawerOpen(false)}
-                >
+                <Drawer anchor="right" open={isColumnDrawerOpen} onClose={() => setIsColumnDrawerOpen(false)}>
                     <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
                         <List>
                             {columns.map((column) => (
@@ -439,15 +272,11 @@ const ReactTable = () => {
                                     <FormControlLabel
                                         control={
                                             <Switch
-                                                checked={
-                                                    tempColumnVisibility[column.accessorKey] !== false
-                                                }
-                                                onChange={() =>
-                                                    setTempColumnVisibility((prev) => ({
-                                                        ...prev,
-                                                        [column.accessorKey]: !prev[column.accessorKey],
-                                                    }))
-                                                }
+                                                checked={tempColumnVisibility[column.accessorKey] !== false}
+                                                onChange={() => setTempColumnVisibility((prev) => ({
+                                                    ...prev,
+                                                    [column.accessorKey]: !prev[column.accessorKey],
+                                                }))}
                                             />
                                         }
                                         label={column.header}
@@ -456,48 +285,17 @@ const ReactTable = () => {
                             ))}
                         </List>
                         <Stack direction="row" spacing={2} justifyContent="flex-end">
-                            <Button
-                                variant="outlined"
-                                onClick={() =>
-                                    setTempColumnVisibility(
-                                        Object.fromEntries(
-                                            columns.map((column) => [
-                                                column.accessorKey,
-                                                false,
-                                            ])
-                                        )
-                                    )
-                                }
-                            >
+                            <Button variant="outlined" onClick={() => setTempColumnVisibility(Object.fromEntries(columns.map((column) => [column.accessorKey, false])))}>
                                 Hide All
                             </Button>
-                            <Button
-                                variant="outlined"
-                                onClick={() =>
-                                    setTempColumnVisibility(
-                                        Object.fromEntries(
-                                            columns.map((column) => [
-                                                column.accessorKey,
-                                                true,
-                                            ])
-                                        )
-                                    )
-                                }
-                            >
+                            <Button variant="outlined" onClick={() => setTempColumnVisibility(Object.fromEntries(columns.map((column) => [column.accessorKey, true])))}>
                                 Show All
                             </Button>
-                            <Button variant="contained" onClick={applyColumnVisibility}>
-                                Apply
-                            </Button>
+                            <Button variant="contained" onClick={applyColumnVisibility}>Apply</Button>
                         </Stack>
                     </Paper>
                 </Drawer>
-
-                <Drawer
-                    anchor="right"
-                    open={isSortDrawerOpen}
-                    onClose={() => setIsSortDrawerOpen(false)}
-                >
+                <Drawer anchor="right" open={isSortDrawerOpen} onClose={() => setIsSortDrawerOpen(false)}>
                     <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
                         <List>
                             {columns.map((column) => (
@@ -505,47 +303,19 @@ const ReactTable = () => {
                                     <ListItemText primary={column.header} />
                                     <Select
                                         value={
-                                            sorting.find((sort) => sort.id === column.accessorKey)
-                                                ?.desc
-                                                ? "desc"
-                                                : sorting.find((sort) => sort.id === column.accessorKey)
-                                                    ? "asc"
-                                                    : ""
+                                            sorting.find((sort) => sort.id === column.accessorKey)?.desc ? "desc" :
+                                            sorting.find((sort) => sort.id === column.accessorKey) ? "asc" : ""
                                         }
                                         onChange={(e) => {
                                             const value = e.target.value;
                                             setSorting((prev) => {
-                                                const existingSort = prev.find(
-                                                    (sort) => sort.id === column.accessorKey
-                                                );
+                                                const existingSort = prev.find((sort) => sort.id === column.accessorKey);
                                                 if (value === "asc") {
-                                                    // If currently sorted ascending, clear the sort
-                                                    if (existingSort) {
-                                                        return prev.filter(
-                                                            (sort) => sort.id !== column.accessorKey
-                                                        );
-                                                    }
-                                                    return [
-                                                        ...prev,
-                                                        { id: column.accessorKey, desc: false },
-                                                    ];
+                                                    return existingSort ? prev.filter((sort) => sort.id !== column.accessorKey) : [...prev, { id: column.accessorKey, desc: false }];
                                                 } else if (value === "desc") {
-                                                    // If currently sorted descending, clear the sort
-                                                    if (existingSort && existingSort.desc) {
-                                                        return prev.filter(
-                                                            (sort) => sort.id !== column.accessorKey
-                                                        );
-                                                    }
-                                                    return [
-                                                        ...prev,
-                                                        { id: column.accessorKey, desc: true },
-                                                    ];
-                                                } else {
-                                                    // If set to none, remove sorting
-                                                    return prev.filter(
-                                                        (sort) => sort.id !== column.accessorKey
-                                                    );
+                                                    return existingSort && existingSort.desc ? prev.filter((sort) => sort.id !== column.accessorKey) : [...prev, { id: column.accessorKey, desc: true }];
                                                 }
+                                                return prev.filter((sort) => sort.id !== column.accessorKey);
                                             });
                                         }}
                                     >
@@ -556,12 +326,8 @@ const ReactTable = () => {
                                 </ListItem>
                             ))}
                         </List>
-                        <Button variant="contained" onClick={applySorting}>
-                            Apply Sorting
-                        </Button>
-                        <Button variant="outlined" onClick={() => setSorting([])}>
-                            Clear Sorting
-                        </Button>
+                        <Button variant="contained" onClick={applySorting}>Apply Sorting</Button>
+                        <Button variant="outlined" onClick={() => setSorting([])}>Clear Sorting</Button>
                     </Paper>
                 </Drawer>
             </Stack>
