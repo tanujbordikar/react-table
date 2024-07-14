@@ -83,6 +83,22 @@ const ReactTable = () => {
         []
     );
 
+    // Load saved settings from localStorage
+    useEffect(() => {
+        const savedSettings = JSON.parse(localStorage.getItem("reactTableSettings")) || {};
+        setGroupedColumns(savedSettings.groupedColumns || []);
+        setColumnVisibility(savedSettings.columnVisibility || {});
+        setSorting(savedSettings.sorting || []);
+        setDateFilters(savedSettings.dateFilters || {
+            createdAt: { min: null, max: null },
+            updatedAt: { min: null, max: null },
+        });
+        setTextFilters(savedSettings.textFilters || {});
+        setSelectFilters(savedSettings.selectFilters || {});
+        setRangeFilters(savedSettings.rangeFilters || {});
+        setTempColumnVisibility(savedSettings.tempColumnVisibility || {});
+    }, []);
+
     const table = useMaterialReactTable({
         columns,
         data,
@@ -129,16 +145,19 @@ const ReactTable = () => {
     const applyGrouping = () => {
         table.setGrouping(groupedColumns);
         setIsGroupDrawerOpen(false);
+        saveSettings();
     };
 
     const applyColumnVisibility = () => {
         setColumnVisibility(tempColumnVisibility);
         setIsColumnDrawerOpen(false);
+        saveSettings();
     };
 
     const applySorting = () => {
         table.setSorting(sorting);
         setIsSortDrawerOpen(false);
+        saveSettings();
     };
 
     const applyFilters = () => {
@@ -150,6 +169,7 @@ const ReactTable = () => {
             ...Object.keys(rangeFilters).map((key) => ({ id: key, value: rangeFilters[key] })),
         ]);
         setIsFilterDrawerOpen(false);
+        saveSettings();
     };
 
     const clearFilters = () => {
@@ -158,6 +178,7 @@ const ReactTable = () => {
         setSelectFilters({});
         setRangeFilters({});
         table.setColumnFilters([]);
+        saveSettings();
     };
 
     const renderCustomFilter = (header) => {
@@ -233,12 +254,27 @@ const ReactTable = () => {
         return null;
     };
 
+    const saveSettings = () => {
+        const settings = {
+            groupedColumns,
+            columnVisibility,
+            sorting,
+            dateFilters,
+            textFilters,
+            selectFilters,
+            rangeFilters,
+            tempColumnVisibility,
+        };
+        localStorage.setItem("reactTableSettings", JSON.stringify(settings));
+    };
+
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <Stack direction={isMobile ? "column-reverse" : "row"} gap="8px">
                 <MaterialReactTable table={table} />
                 <Drawer anchor="right" open={isFilterDrawerOpen} onClose={() => setIsFilterDrawerOpen(false)}>
                     <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
+                        <label style={{ fontSize: "20px" }}>Filters</label>
                         <Stack gap="8px">
                             {table.getLeafHeaders().map((header) => header.column.getCanFilter() && renderCustomFilter(header))}
                             <Button variant="contained" onClick={applyFilters}>
@@ -252,6 +288,7 @@ const ReactTable = () => {
                 </Drawer>
                 <Drawer anchor="right" open={isGroupDrawerOpen} onClose={() => setIsGroupDrawerOpen(false)}>
                     <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
+                        <label style={{ fontSize: "20px" }}>Create Groups</label>
                         <List>
                             {columns.filter((col) => col.enableGrouping).map((column) => (
                                 <ListItem key={column.accessorKey} onClick={() => handleGroupToggle(column.accessorKey)}>
@@ -266,6 +303,7 @@ const ReactTable = () => {
                 </Drawer>
                 <Drawer anchor="right" open={isColumnDrawerOpen} onClose={() => setIsColumnDrawerOpen(false)}>
                     <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
+                        <label style={{ fontSize: "20px" }}>Show/Hide Columns</label>
                         <List>
                             {columns.map((column) => (
                                 <ListItem key={column.accessorKey}>
@@ -297,6 +335,7 @@ const ReactTable = () => {
                 </Drawer>
                 <Drawer anchor="right" open={isSortDrawerOpen} onClose={() => setIsSortDrawerOpen(false)}>
                     <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
+                        <label style={{ fontSize: "20px" }}>Sorting Options</label>
                         <List>
                             {columns.map((column) => (
                                 <ListItem key={column.accessorKey}>
