@@ -38,8 +38,8 @@ const ReactTable = () => {
                 );
                 const formattedData = response.data.map((item) => ({
                     ...item,
-                    createdAt: moment(item.createdAt).format("MM-DD-YYYY"),
-                    updatedAt: moment(item.updatedAt).format("MM-DD-YYYY"),
+                    createdAt: moment(item.createdAt).format("DD-MMM-YYYY"),
+                    updatedAt: moment(item.updatedAt).format("DD-MMM-YYYY"),
                 }));
                 setData(formattedData);
             } catch (error) {
@@ -57,8 +57,8 @@ const ReactTable = () => {
             { accessorKey: "name", header: "Name", enableGrouping: false, size: 150, filterFn: "includesString", filterVariant: "text" },
             { accessorKey: "category", header: "Category", enableGrouping: true, size: 200, filterFn: "arrIncludes", filterVariant: "multi-select" },
             { accessorKey: "subcategory", header: "Sub Category", enableGrouping: true, size: 200, filterFn: "arrIncludes", filterVariant: "multi-select" },
-            { accessorKey: "createdAt", header: "Created At", enableGrouping: false, size: 200, filterFn: "dateBetween", sortingFn: 'datetime', filterVariant: "date", Cell: ({ cell }) => moment(cell.getValue()).format("MM-DD-YYYY"), },
-            { accessorKey: "updatedAt", header: "Updated At", enableGrouping: false, size: 200, filterFn: "dateBetween", sortingFn: 'datetime', filterVariant: "date", Cell: ({ cell }) => moment(cell.getValue()).format("MM-DD-YYYY"), },
+            { accessorKey: "createdAt", header: "Created At", enableGrouping: false, size: 200, filterFn: "dateBetween", sortingFn: 'datetime', filterVariant: "date", Cell: ({ cell }) => moment(cell.getValue()).format("DD-MMM-YYYY"), },
+            { accessorKey: "updatedAt", header: "Updated At", enableGrouping: false, size: 200, filterFn: "dateBetween", sortingFn: 'datetime', filterVariant: "date", Cell: ({ cell }) => moment(cell.getValue()).format("DD-MMM-YYYY"), },
             { accessorKey: "price", header: "Price", enableGrouping: false, size: 150, filterFn: "between", filterVariant: "range-slider" },
             { accessorKey: "sale_price", header: "Sale Price", enableGrouping: false, size: 150, filterFn: "between", filterVariant: "range-slider" },
         ],
@@ -145,8 +145,8 @@ const ReactTable = () => {
 
     const applyFilters = () => {
         table.setColumnFilters([
-            { id: "createdAt", value: dateFilters.createdAt.min ? [moment(dateFilters.createdAt.min).format("MM-DD-YYYY"), dateFilters.createdAt.max ? moment(dateFilters.createdAt.max).format("MM-DD-YYYY") : undefined] : undefined },
-            { id: "updatedAt", value: dateFilters.updatedAt.min ? [moment(dateFilters.updatedAt.min).format("MM-DD-YYYY"), dateFilters.updatedAt.max ? moment(dateFilters.updatedAt.max).format("MM-DD-YYYY") : undefined] : undefined },
+            { id: "createdAt", value: dateFilters.createdAt.min ? [moment(dateFilters.createdAt.min).format("DD-MMM-YYYY"), dateFilters.createdAt.max ? moment(dateFilters.createdAt.max).format("DD-MMM-YYYY") : undefined] : undefined },
+            { id: "updatedAt", value: dateFilters.updatedAt.min ? [moment(dateFilters.updatedAt.min).format("DD-MMM-YYYY"), dateFilters.updatedAt.max ? moment(dateFilters.updatedAt.max).format("DD-MMM-YYYY") : undefined] : undefined },
             ...Object.keys(textFilters).map((key) => ({ id: key, value: textFilters[key] })),
             ...Object.keys(selectFilters).map((key) => ({ id: key, value: selectFilters[key] })),
             ...Object.keys(rangeFilters).map((key) => ({ id: key, value: rangeFilters[key] })),
