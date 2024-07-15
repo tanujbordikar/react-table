@@ -109,6 +109,7 @@ const ReactTable = () => {
         enableGrouping: true,
         enableHiding: true,
         paginationDisplayMode: "pages",
+        muiPaginationProps: { showRowsPerPage: false },
         enableDensityToggle: false,
         initialState: { density: "compact", grouping: groupedColumns },
         state: { columnVisibility, sorting },
