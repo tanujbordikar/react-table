@@ -173,14 +173,14 @@ const ReactTable = () => {
                 <Box key={header.id} sx={{ mb: 2 }}>
                     <DatePicker
                         label={`Min ${column.header}`}
-                        value={dateFilters[accessorKey]?.min || null}
-                        onChange={(newValue) => setDateFilters((prev) => ({ ...prev, [accessorKey]: { ...prev[accessorKey], min: newValue } }))}
+                        value={dateFilters[accessorKey]?.min ? moment(dateFilters[accessorKey]?.min) : null}
+                        onChange={(newValue) => setDateFilters((prev) => ({ ...prev, [accessorKey]: { ...prev[accessorKey], min: newValue ? moment(newValue) : null } }))}
                         slotProps={{ textField: { variant: "standard" } }}
                     />
                     <DatePicker
                         label={`Max ${column.header}`}
-                        value={dateFilters[accessorKey]?.max || null}
-                        onChange={(newValue) => setDateFilters((prev) => ({ ...prev, [accessorKey]: { ...prev[accessorKey], max: newValue } }))}
+                        value={dateFilters[accessorKey]?.max ? moment(dateFilters[accessorKey]?.max) : null}
+                        onChange={(newValue) => setDateFilters((prev) => ({ ...prev, [accessorKey]: { ...prev[accessorKey], max: newValue ? moment(newValue) : null } }))}
                         slotProps={{ textField: { variant: "standard" } }}
                     />
                 </Box>
