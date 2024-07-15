@@ -72,7 +72,7 @@ const ReactTable = () => {
     const columns = useMemo(
         () => [
             { accessorKey: "id", header: "ID", enableGrouping: false, size: 150, filterFn: "equals", filterVariant: "text" },
-            { accessorKey: "name", header: "Name", enableGrouping: false, size: 150, filterFn: "includesString", filterVariant: "text" },
+            { accessorKey: "name", header: "Name", enableGrouping: false, size: 150, filterFn: "fuzzy", filterVariant: "text" },
             { accessorKey: "category", header: "Category", enableGrouping: true, size: 200, filterFn: "arrIncludes", filterVariant: "multi-select" },
             { accessorKey: "subcategory", header: "Sub Category", enableGrouping: true, size: 200, filterFn: "arrIncludes", filterVariant: "multi-select" },
             { accessorKey: "createdAt", header: "Created At", enableGrouping: false, size: 200, filterFn: "dateBetween", sortingFn: 'datetime', filterVariant: "date", Cell: ({ cell }) => moment(cell.getValue()).format("DD-MMM-YYYY"), },
@@ -99,9 +99,16 @@ const ReactTable = () => {
         setTempColumnVisibility(savedSettings.tempColumnVisibility || {});
     }, []);
 
+    const fuzzyFilterFn = (rows, id, filterValue) => {
+        return matchSorter(rows, filterValue, { keys: [row => row.values[id]] });
+    };
+
     const table = useMaterialReactTable({
         columns,
         data,
+        columnFilterFns: {
+            fuzzy: fuzzyFilterFn,
+        },
         columnFilterDisplayMode: "custom",
         enableColumnFilterModes: true,
         enableGlobalFilter: true,
