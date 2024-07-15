@@ -1,34 +1,16 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
 import axios from "axios";
-import {
-    useMaterialReactTable,
-    MaterialReactTable,
-    MRT_ToggleGlobalFilterButton,
-} from "material-react-table";
+import { useMaterialReactTable, MaterialReactTable, MRT_ToggleGlobalFilterButton } from "material-react-table";
 import moment from "moment";
-import {
-    Select,
-    MenuItem,
-    Box,
-    IconButton,
-    Button,
-    Drawer,
-    Paper,
-    Stack,
-    useMediaQuery,
-    List,
-    ListItem,
-    ListItemText,
-    Checkbox,
-    FormControlLabel,
-    Switch,
-    TextField,
-    Slider,
-} from "@mui/material";
+import { Select, MenuItem, Box, IconButton, Stack, useMediaQuery, TextField, Slider } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { FilterList, Group, ViewColumn, Sort } from "@mui/icons-material";
+import GroupDrawer from "./components/GroupDrawer";
+import ColumnDrawer from "./components/ColumnDrawer";
+import SortDrawer from "./components/SortDrawer";
+import FilterDrawer from "./components/FilterDrawer";
 
 const ReactTable = () => {
     const [data, setData] = useState([]);
@@ -273,103 +255,38 @@ const ReactTable = () => {
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <Stack direction={isMobile ? "column-reverse" : "row"} gap="8px">
                 <MaterialReactTable table={table} />
-                <Drawer anchor="right" open={isFilterDrawerOpen} onClose={() => setIsFilterDrawerOpen(false)}>
-                    <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
-                        <label style={{ fontSize: "20px" }}>Filters</label>
-                        <Stack gap="8px">
-                            {table.getLeafHeaders().map((header) => header.column.getCanFilter() && renderCustomFilter(header))}
-                            <Button variant="contained" onClick={applyFilters}>
-                                Apply Filters
-                            </Button>
-                            <Button variant="outlined" onClick={clearFilters}>
-                                Clear Filters
-                            </Button>
-                        </Stack>
-                    </Paper>
-                </Drawer>
-                <Drawer anchor="right" open={isGroupDrawerOpen} onClose={() => setIsGroupDrawerOpen(false)}>
-                    <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
-                        <label style={{ fontSize: "20px" }}>Create Groups</label>
-                        <List>
-                            {columns.filter((col) => col.enableGrouping).map((column) => (
-                                <ListItem key={column.accessorKey} onClick={() => handleGroupToggle(column.accessorKey)}>
-                                    <Checkbox checked={groupedColumns.includes(column.accessorKey)} />
-                                    <ListItemText primary={column.header} />
-                                </ListItem>
-                            ))}
-                        </List>
-                        <Button variant="contained" onClick={applyGrouping}>Apply</Button>
-                        <Button variant="outlined" onClick={() => setGroupedColumns([])}>Clear Grouping</Button>
-                    </Paper>
-                </Drawer>
-                <Drawer anchor="right" open={isColumnDrawerOpen} onClose={() => setIsColumnDrawerOpen(false)}>
-                    <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
-                        <label style={{ fontSize: "20px" }}>Show/Hide Columns</label>
-                        <List>
-                            {columns.map((column) => (
-                                <ListItem key={column.accessorKey}>
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={tempColumnVisibility[column.accessorKey] !== false}
-                                                onChange={() => setTempColumnVisibility((prev) => ({
-                                                    ...prev,
-                                                    [column.accessorKey]: !prev[column.accessorKey],
-                                                }))}
-                                            />
-                                        }
-                                        label={column.header}
-                                    />
-                                </ListItem>
-                            ))}
-                        </List>
-                        <Stack direction="row" spacing={2} justifyContent="flex-end">
-                            <Button variant="outlined" onClick={() => setTempColumnVisibility(Object.fromEntries(columns.map((column) => [column.accessorKey, false])))}>
-                                Hide All
-                            </Button>
-                            <Button variant="outlined" onClick={() => setTempColumnVisibility(Object.fromEntries(columns.map((column) => [column.accessorKey, true])))}>
-                                Show All
-                            </Button>
-                            <Button variant="contained" onClick={applyColumnVisibility}>Apply</Button>
-                        </Stack>
-                    </Paper>
-                </Drawer>
-                <Drawer anchor="right" open={isSortDrawerOpen} onClose={() => setIsSortDrawerOpen(false)}>
-                    <Paper style={{ width: 300, padding: "16px", overflowY: "auto" }}>
-                        <label style={{ fontSize: "20px" }}>Sorting Options</label>
-                        <List>
-                            {columns.map((column) => (
-                                <ListItem key={column.accessorKey}>
-                                    <ListItemText primary={column.header} />
-                                    <Select
-                                        value={
-                                            sorting.find((sort) => sort.id === column.accessorKey)?.desc ? "desc" :
-                                            sorting.find((sort) => sort.id === column.accessorKey) ? "asc" : ""
-                                        }
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            setSorting((prev) => {
-                                                const existingSort = prev.find((sort) => sort.id === column.accessorKey);
-                                                if (value === "asc") {
-                                                    return existingSort ? prev.filter((sort) => sort.id !== column.accessorKey) : [...prev, { id: column.accessorKey, desc: false }];
-                                                } else if (value === "desc") {
-                                                    return existingSort && existingSort.desc ? prev.filter((sort) => sort.id !== column.accessorKey) : [...prev, { id: column.accessorKey, desc: true }];
-                                                }
-                                                return prev.filter((sort) => sort.id !== column.accessorKey);
-                                            });
-                                        }}
-                                    >
-                                        <MenuItem value="">None</MenuItem>
-                                        <MenuItem value="asc">Ascending</MenuItem>
-                                        <MenuItem value="desc">Descending</MenuItem>
-                                    </Select>
-                                </ListItem>
-                            ))}
-                        </List>
-                        <Button variant="contained" onClick={applySorting}>Apply Sorting</Button>
-                        <Button variant="outlined" onClick={() => setSorting([])}>Clear Sorting</Button>
-                    </Paper>
-                </Drawer>
+                <FilterDrawer
+                    table={table}
+                    isFilterDrawerOpen={isFilterDrawerOpen}
+                    setIsFilterDrawerOpen={setIsFilterDrawerOpen}
+                    renderCustomFilter={renderCustomFilter}
+                    applyFilters={applyFilters}
+                    clearFilters={clearFilters}
+                />
+                <GroupDrawer
+                    isGroupDrawerOpen={isGroupDrawerOpen}
+                    setIsGroupDrawerOpen={setIsGroupDrawerOpen}
+                    columns={columns}
+                    groupedColumns={groupedColumns}
+                    handleGroupToggle={handleGroupToggle}
+                    applyGrouping={applyGrouping}
+                />
+                <ColumnDrawer
+                    isColumnDrawerOpen={isColumnDrawerOpen}
+                    setIsColumnDrawerOpen={setIsColumnDrawerOpen}
+                    columns={columns}
+                    tempColumnVisibility={tempColumnVisibility}
+                    setTempColumnVisibility={setTempColumnVisibility}
+                    applyColumnVisibility={applyColumnVisibility}
+                />
+                <SortDrawer
+                    isSortDrawerOpen={isSortDrawerOpen}
+                    setIsSortDrawerOpen={setIsSortDrawerOpen}
+                    columns={columns}
+                    sorting={sorting}
+                    setSorting={setSorting}
+                    applySorting={applySorting}
+                />
             </Stack>
         </LocalizationProvider>
     );
